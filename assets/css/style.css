@@ -2,3 +2,52 @@ html {
   font-family: 'Roboto',
     sans-serif;
 }
+
+
+.message-card {
+  position: absolute;
+  top: 73%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  padding: 0px;
+}
+
+
+.message-title {
+  padding-left: 25px;
+  text-align: center;
+  font-size: 1.15em;
+}
+
+#message-content {
+  padding: 0px;
+  font-size: 0.95em;
+  margin-top: 12px;
+}
+
+#message-action {
+  padding-top: 6px;
+  padding-bottom: 5px;
+  margin-top: 12px;
+}
+
+#messages {
+  padding-left: 33px;
+  padding-right: 33px;
+}
+
+.message-text {
+  width: 10px;
+  font-size: 0.95em;
+}
+
+.submit-btn {
+  float: right;
+  width: 53px;
+}
+
+.divider {
+  margin-top: 10px;
+}
+
