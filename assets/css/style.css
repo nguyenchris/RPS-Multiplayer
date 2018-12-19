@@ -4,6 +4,28 @@ html {
 }
 
 
+/* .player-card {
+  width: 35%;
+  height: 200px;
+} */
+
+.title {
+  text-align: center;
+}
+
+.profile-img {
+  height: 50px;
+  margin-left: 10px;
+  margin-top: 50%;
+}
+
+
+.rock-btn, .paper-btn, .scissors-btn {
+  padding-left: 12px;
+  padding-right: 10px;
+  text-align: center;
+}
+
 .message-card {
   position: absolute;
   top: 73%;
@@ -17,7 +39,7 @@ html {
 .message-title {
   padding-left: 25px;
   text-align: center;
-  font-size: 1.15em;
+  font-size: 1em;
 }
 
 #message-content {
@@ -35,19 +57,36 @@ html {
 #messages {
   padding-left: 33px;
   padding-right: 33px;
+  overflow-y: scroll;
+  height: 170px;
+  width: 780px;
 }
 
-.message-text {
+#message-text {
   width: 10px;
   font-size: 0.95em;
 }
 
-.submit-btn {
-  float: right;
-  width: 53px;
+#message-form {
+  width: 700px;
+}
+
+#textarea2 {
+  padding-top: 0;
+  margin-bottom: 0;
+}
+
+#chat-label {
+  font-size: .9em;
+}
+
+.send-btn {
+  width: 50px;
+  height: 35px;
+  display: inline-block;
+  margin-top: 30px;
 }
 
 .divider {
   margin-top: 10px;
 }
-

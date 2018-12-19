@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700" rel="stylesheet">
+  <link rel="stylesheet" href="animate.min.css">
   <link rel="stylesheet" href="assets/css/style.css">
 </head>
 
@@ -30,12 +31,69 @@
 
   <div class="container">
 
+    <div class="row title">
+      <form>
+        <div class="col s12">
+          <div class="input-field inline">
+            <input id="name_inline" type="text" class="validate">
+            <label for="name_inline">Name</label>
+            <a class="waves-effect waves-light btn-small start-btn">Start</a>
+          </div>
+        </div>
+      </form>
+    </div>
 
+
+    <div class="row">
+
+
+      <div class="col s4">
+        <h3 class="header player-1">Player 1</h3>
+        <div class="card horizontal player-card">
+          <div class="card-image">
+            <img src="assets/images/profile.png" class="profile-img">
+          </div>
+          <div class="card-stacked">
+            <div class="card-content">
+              <p>I am a very simple card. I am good at containing small bits of information.</p>
+            </div>
+            <div class="card-action">
+              <a class="waves-effect waves-light btn rock-btn">Rock</a>
+              <a class="waves-effect waves-light btn paper-btn">Paper</a>
+              <a class="waves-effect waves-light btn scissors-btn">Scissors</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="col s4 m4">
+        <h3 class="header player-1">Player 1</h3>
+        <div class="card horizontal player-card">
+          <div class="card-image">
+            <img src="assets/images/profile.png" class="profile-img" id="p2">
+          </div>
+          <div class="card-stacked">
+            <div class="card-content">
+              <p>I am a very simple card. I am good at containing small bits of information.</p>
+            </div>
+            <div class="card-action">
+              <a class="waves-effect waves-light btn rock-btn">Rock</a>
+              <a class="waves-effect waves-light btn paper-btn">Paper</a>
+              <a class="waves-effect waves-light btn scissors-btn">Scissors</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="section">
       <div class="row">
         <div class="col s12">
-
+          <!-- <img src="assets/images/paper.jpg" alt="Paper">
+          <img src="assets/images/rock.jpg" alt="Rock">
+          <img src="assets/images/scissors.jpg" alt="Scissors"> -->
         </div>
       </div>
     </div>
@@ -68,20 +126,24 @@
                 <p>messagess</p>
                 <p>messagess</p>
                 <p>messagess</p>
+                <p>messagess</p>
+                <p>messagess</p>
+                <p>messagess</p>
+                <p>messagess</p>
+                <p>messagess</p>
+                <p>messagessmessagessmessagessmessagess</p>
+                <p>messagess</p>
               </div>
               <div class="card-action" id="message-action">
                 <form id="message-form" action="#">
-                  <div class="input-field col s12 message-text">
+                  <div class="input-field col s12 message-text" #message-text>
                     <textarea id="textarea2" class="materialize-textarea" data-length="120"></textarea>
-                    <label for="textarea2">Chat Message</label>
-                    <button class="btn waves-effect waves-light submit-btn" type="submit" name="action">
-                      <i class="material-icons right send-icon">send</i>
-                    </button>
+                    <label for="textarea2" id="chat-label">Chat Message</label>
                   </div>
-                  <!-- <button id="submit" disabled type="submit" class="">
-                    Send
-                  </button> -->
                 </form>
+                <button class="btn waves-effect waves-light send-btn" type="submit" name="action">
+                  <i class="material-icons right send-icon">send</i>
+                </button>
               </div>
             </div>
           </div>
