@@ -10,7 +10,7 @@ const config = {
 firebase.initializeApp(config);
 
 
-
+// Data Controller
 const dataController = (function () {
 
   // Firebase database reference
@@ -27,12 +27,20 @@ const dataController = (function () {
     connectionsRef: dB.ref("connections")
   }
 
+  let gameData = {
+    players: []
+  }
+
 
   return {
 
     // Return dbRef object
     getDbRef: function () {
       return dbRef;
+    },
+
+    getGameData: function () {
+      return gameData;
     }
   }
 
@@ -42,14 +50,17 @@ const dataController = (function () {
 
 
 
-
+// UI Controller
 const uiController = (function () {
 
   const cacheDOM = {
     $sendBtn: $('.send-btn'),
     $chatText: $('#textarea2'),
     $messages: $('#messages'),
-    $messageForm: $('#message-form')
+    $messageForm: $('#message-form'),
+    $startBtn: $('.start-btn'),
+    $nameInput: $('#name-input'),
+    $nameTextInput: $('#name_text_input')
   }
 
   return {
@@ -66,7 +77,7 @@ const uiController = (function () {
 
 
 
-
+// Global App Controller
 const appController = (function (dataCtrl, uiCtrl) {
 
   const dB = dataCtrl.getDbRef();
@@ -76,12 +87,39 @@ const appController = (function (dataCtrl, uiCtrl) {
   const setupEventListeners = () => {
 
     dom.$sendBtn.on('click', addChatMsg);
+
     dom.$messageForm.keypress((e) => {
-      // e.preventDefault();
 
       if (e.which === 13) {
         addChatMsg();
       }
+    });
+
+
+    dom.$startBtn.on('click', () => {
+
+
+      let gD = dataCtrl.getGameData();
+
+      let playerName = $('#name_text_input').val();
+      console.log(playerName);
+
+      if (playerName.length > 0 && gD.players.length <= 2) {
+
+        console.log(playerName);
+
+        // dB.connectedRef.on('value', (snap) => {
+        //   if (snap.val()) {
+        //     dB.connectionsRef.push(true);
+        //     dB.connectionsRef.onDisconnect().remove();
+        //   }
+        // });
+
+        checkPlayerAmt(playerName);
+
+        // dB.playersRef.push()
+      }
+
     })
 
   }
@@ -96,20 +134,23 @@ const appController = (function (dataCtrl, uiCtrl) {
     })
 
     dB.chatRef.on('child_added', (snap) => {
-      let html = `<p>${snap.val()}</p>` /// need to figure out how to add name of player and time during append
+      let html = `<p>${snap.val()}</p>`; /// need to figure out how to add name of player and time during append
       dom.$messages.append(html);
       dom.$messages.scrollTop(dom.$messages[0].scrollHeight)
     });
 
 
 
-    // dB.connectedRef.on("value", (snap) => {
-    //   if (snap.val() === true) {
-    //     alert("connected");
-    //   } else {
-    //     alert("not connected");
+    // dB.connectedRef.on('value', (snap) => {
+    //   if (snap.val()) {
+    //     dB.connectionsRef.push(true);
+    //     dB.connectionsRef.onDisconnect().remove();
     //   }
     // });
+
+    // dB.connectionsRef.on('value', (snap) => {
+
+    // })
   }
 
 
@@ -125,6 +166,15 @@ const appController = (function (dataCtrl, uiCtrl) {
   }
 
 
+  const checkPlayerAmt = () => {
+    dB.connectedRef.on('value', (snap) => {
+      if (snap.val()) {
+        console.log(playerName);
+      }
+    });
+  }
+
+
 
   return {
 
@@ -136,5 +186,5 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 })(dataController, uiController);
 
-// initalize App
+// Initalize App
 appController.init();
