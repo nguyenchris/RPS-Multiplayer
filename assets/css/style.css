@@ -63,8 +63,13 @@ html {
 }
 
 #message-text {
-  width: 10px;
+  width: 700px;
   font-size: 0.95em;
+  height: 50px;
+}
+
+#messages p:first-letter {
+  text-transform:  capitalize;
 }
 
 #message-form {
