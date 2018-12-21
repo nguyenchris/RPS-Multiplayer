@@ -28,11 +28,10 @@ const dataController = (function () {
   }
 
   let gameData = {
-    players: [],
     p1Presence: false,
     p2Presence: false,
-    p1Name: '',
-    p2Name: ''
+    p1Data: {},
+    p2Data: {}
   }
 
 
@@ -63,12 +62,26 @@ const uiController = (function () {
     $messages: $('#messages'),
     $messageForm: $('#message-form'),
     $startBtn: $('.start-btn'),
-    $nameInput: $('.name-input')
+    $nameInput: $('.name-input'),
+    $p1Content: $('.p1-content'),
+    $p2Content: $('.p2-content'),
+    $p1Header: $('.player-1'),
+    $p2Header: $('.player-2')
   }
+
+
 
   return {
     getCacheDOM: function () {
       return cacheDOM;
+    },
+
+    displayPlayerContent: function (name, selector) {
+      selector.text(name);
+    },
+
+    displayWaiting: function (player) {
+
     }
   }
 
@@ -85,6 +98,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
   const dB = dataCtrl.getDbRef();
   const dom = uiCtrl.getCacheDOM();
+  let gData = dataCtrl.getGameData();
 
 
   const setupEventListeners = () => {
@@ -107,7 +121,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       let playerName = dom.$nameInput.val();
 
       if (playerName.length > 0) {
-        gD.players.push(playerName)
+        dom.$nameInput.val('');
         assignPlayerName(playerName);
       }
     });
@@ -119,10 +133,26 @@ const appController = (function (dataCtrl, uiCtrl) {
 
     // On listener for presence of players
     dB.playersRef.on('value', (snap) => {
-      gData = dataCtrl.getGameData();
 
       gData.p1Presence = snap.child('p1').exists();
       gData.p2Presence = snap.child('p2').exists();
+
+      p1Name = snap.child('p1').child('name').val()
+      p2Name = snap.child('p2').child('name').val()
+
+      
+      console.log('check')
+
+      if (gData.p1Presence === true && gData.p2Presence === false) {
+        uiCtrl.displayPlayerContent(p1Name, dom.$p1Header);
+        uiCtrl.displayPlayerContent('Player 2', dom.$p2Header)
+      } else if (gData.p1Presence === false && gData.p2Presence === true) {
+        uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
+        uiCtrl.displayPlayerContent('Player 1', dom.$p1Header)
+        // uiCtrl.displayPlayerContent(false, true);
+      } else {
+        console.log('start game')
+      }
     });
 
 
@@ -153,7 +183,6 @@ const appController = (function (dataCtrl, uiCtrl) {
   Assigns the username that is passed as an argument to the player 1 or 2 
   depending on the presence of the player in the game
   */
-
   const assignPlayerName = (name) => {
     let gData = dataCtrl.getGameData();
 
@@ -162,20 +191,26 @@ const appController = (function (dataCtrl, uiCtrl) {
 
         if (!gData.p1Presence) {
 
-          gData.p1Name = name;
+          // gData.p1Name = name;
 
           dB.p1Ref.set({
-            name: name
+            name: name,
+            wins: 0,
+            losses: 0,
+            choice: ''
           });
 
           dB.p1Ref.onDisconnect().remove();
 
         } else if (!gData.p2Presence) {
 
-          gData.p2Name = name;
+          // gData.p2Name = name;
 
           dB.p2Ref.set({
-            name: name
+            name: name,
+            wins: 0,
+            losses: 0,
+            choice: ''
           });
 
           dB.p2Ref.onDisconnect().remove();
