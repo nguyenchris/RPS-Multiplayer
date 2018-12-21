@@ -20,15 +20,19 @@ const dataController = (function () {
   const dbRef = {
     chatRef: dB.ref('/chat'),
     playersRef: dB.ref('players'),
-    // p1Ref: this.playersRef.child('p1'),
-    // p2Ref: this.playersRef.child('p2'),
+    p1Ref: dB.ref('/players/p1'),
+    p2Ref: dB.ref('/players/p2'),
     turnRef: dB.ref('turn'),
     connectedRef: dB.ref(".info/connected"),
     connectionsRef: dB.ref("connections")
   }
 
   let gameData = {
-    players: []
+    players: [],
+    p1Presence: false,
+    p2Presence: false,
+    p1Name: '',
+    p2Name: ''
   }
 
 
@@ -59,8 +63,7 @@ const uiController = (function () {
     $messages: $('#messages'),
     $messageForm: $('#message-form'),
     $startBtn: $('.start-btn'),
-    $nameInput: $('#name-input'),
-    $nameTextInput: $('#name_text_input')
+    $nameInput: $('.name-input')
   }
 
   return {
@@ -86,75 +89,55 @@ const appController = (function (dataCtrl, uiCtrl) {
 
   const setupEventListeners = () => {
 
+    // Click event listener in order to add a new chat message
     dom.$sendBtn.on('click', addChatMsg);
 
+    // Keypress event listener to add a new chat message
     dom.$messageForm.keypress((e) => {
-
-      if (e.which === 13) {
+      if (e.keyCode === 13 || e.which === 13) {
+        e.preventDefault();
         addChatMsg();
       }
     });
 
-
+    // Start button click event listener to add player to game
     dom.$startBtn.on('click', () => {
 
-
       let gD = dataCtrl.getGameData();
+      let playerName = dom.$nameInput.val();
 
-      let playerName = $('#name_text_input').val();
-      console.log(playerName);
-
-      if (playerName.length > 0 && gD.players.length <= 2) {
-
-        console.log(playerName);
-
-        // dB.connectedRef.on('value', (snap) => {
-        //   if (snap.val()) {
-        //     dB.connectionsRef.push(true);
-        //     dB.connectionsRef.onDisconnect().remove();
-        //   }
-        // });
-
-        checkPlayerAmt(playerName);
-
-        // dB.playersRef.push()
+      if (playerName.length > 0) {
+        gD.players.push(playerName)
+        assignPlayerName(playerName);
       }
-
-    })
-
-  }
+    });
+  };
 
 
 
   const setupOnListeners = () => {
 
-    // test
-    dB.playersRef.set({
-      name: 'Chris'
-    })
+    // On listener for presence of players
+    dB.playersRef.on('value', (snap) => {
+      gData = dataCtrl.getGameData();
 
-    dB.chatRef.on('child_added', (snap) => {
-      let html = `<p>${snap.val()}</p>`; /// need to figure out how to add name of player and time during append
-      dom.$messages.append(html);
-      dom.$messages.scrollTop(dom.$messages[0].scrollHeight)
+      gData.p1Presence = snap.child('p1').exists();
+      gData.p2Presence = snap.child('p2').exists();
     });
 
 
 
-    // dB.connectedRef.on('value', (snap) => {
-    //   if (snap.val()) {
-    //     dB.connectionsRef.push(true);
-    //     dB.connectionsRef.onDisconnect().remove();
-    //   }
-    // });
-
-    // dB.connectionsRef.on('value', (snap) => {
-
-    // })
-  }
+    // On listener for if a chat message has been sent
+    dB.chatRef.on('child_added', (snap) => {
+      let html = `<p>${snap.val()}</p>`; /// need to figure out how to add name of player and time during append
+      dom.$messages.append(html);
+      dom.$messages.scrollTop(dom.$messages[0].scrollHeight);
+    });
+  };
 
 
 
+  // Adds message to UI and database
   const addChatMsg = () => {
 
     let msg = dom.$chatText.val();
@@ -163,16 +146,47 @@ const appController = (function (dataCtrl, uiCtrl) {
       dB.chatRef.push(msg); /// need to figure out how to add name of player and time during push
       dom.$chatText.val('');
     }
-  }
+  };
 
 
-  const checkPlayerAmt = () => {
+  /*
+  Assigns the username that is passed as an argument to the player 1 or 2 
+  depending on the presence of the player in the game
+  */
+
+  const assignPlayerName = (name) => {
+    let gData = dataCtrl.getGameData();
+
     dB.connectedRef.on('value', (snap) => {
-      if (snap.val()) {
-        console.log(playerName);
+      if (snap.val() === true) {
+
+        if (!gData.p1Presence) {
+
+          gData.p1Name = name;
+
+          dB.p1Ref.set({
+            name: name
+          });
+
+          dB.p1Ref.onDisconnect().remove();
+
+        } else if (!gData.p2Presence) {
+
+          gData.p2Name = name;
+
+          dB.p2Ref.set({
+            name: name
+          });
+
+          dB.p2Ref.onDisconnect().remove();
+        } else {
+          html = '<p>too many players</p>'
+          $('.title').append(html);
+        }
       }
     });
-  }
+
+  };
 
 
 
