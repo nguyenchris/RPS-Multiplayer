@@ -39,7 +39,9 @@ const dataController = (function () {
     p1Choice: '',
     p2Choice: '',
     numPlayers: 0,
-    playerName: ''
+    playerName: '',
+    gameStart: false,
+    chatName: ''
   }
 
 
@@ -76,7 +78,9 @@ const uiController = (function () {
     $p2Content: $('.p2-content'),
     $p1Header: $('.player-1'),
     $p2Header: $('.player-2'),
-    $title: $('.title')
+    $title: $('.title'),
+    $modal: $('#modal1'),
+    $nameForm: $('#name-form')
   }
 
 
@@ -111,8 +115,9 @@ const appController = (function (dataCtrl, uiCtrl) {
   let gData = dataCtrl.getGameData();
 
 
-  const setupEventListeners = () => {
 
+
+  const setupEventListeners = () => {
 
     // Click event listener in order to add a new chat message
     dom.$sendBtn.on('click', addChatMsg);
@@ -126,17 +131,9 @@ const appController = (function (dataCtrl, uiCtrl) {
     });
 
     // Start button click event listener to add player to game
-    dom.$startBtn.on('click', () => {
-
-      let gD = dataCtrl.getGameData();
-      gData.playerName = dom.$nameInput.val().trim();
-
-      if (gData.playerName.length > 0) {
-        dom.$nameInput.val('');
-        assignPlayerName(gData.playerName);
-      }
-    });
+    dom.$startBtn.on('click', checkPlayerName)
   };
+
 
 
 
@@ -147,74 +144,116 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.p1Presence = snap.child('p1').exists();
       gData.p2Presence = snap.child('p2').exists();
 
-      gData.p1Data = snap.child('p1').val()
-      gData.p2Data = snap.child('p2').val()
+      gData.p1Data = snap.child('p1').val();
+      gData.p2Data = snap.child('p2').val();
 
-      gData.numPlayers = snap.numChildren()
+      gData.numPlayers = snap.numChildren();
 
-      displayModal();
+      if (gData.numPlayers <= 2) {
+        if (gData.p1Presence) {
+          uiCtrl.displayPlayerContent(gData.p1Data.name, dom.$p1Header);
+        } else {
+          uiCtrl.displayPlayerContent('Player 1', dom.$p1Header);
+        }
 
-      if (gData.p1Presence) {
-        uiCtrl.displayPlayerContent(gData.p1Data.name, dom.$p1Header);
+        if (gData.p2Presence) {
+          uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
+        } else {
+          uiCtrl.displayPlayerContent('Player 2', dom.$p2Header);
+        }
+        displayModal();
       }
-
-      if (gData.p2Presence) {
-        uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
-      }
-
     });
 
 
     ///// use this to display the disconnected alert in chat
-    dB.playersRef.on('child_removed', (snap) => {
+    // dB.playersRef.on('child_removed', (snap) => {
 
+    //   let name = snap.child('name').val()
+    //   let msg = 'Has disconnected from the game.'
+    //   dB.chatRef.push(name)
 
-      console.log(snap.val())
-    })
+    //   updateChatDb(name, msg, true)
+    // })
 
 
 
     // On listener if a chat message has been sent
-    dB.chatRef.on('child_added', (snap) => {
+    dB.chatRef.orderByChild('time').on('child_added', (snap) => {
+      let chatObj = snap.val();
+      let status = chatObj.status
+      let time = moment(chatObj.time).calendar()
+      let html = `<p class='animated fadeIn chat-message holder'><span class='chat-name'>${chatObj.name}: </span>${chatObj.msg}<span class='chat-date'>${time}</span></p>`;
 
-      let html = `<span></span><p class='animated fadeIn chat-message'>${snap.val()}<span class='chat-date'></p>`;
-      dom.$messages.append(html);
+      if (status) {
+        let newHtml = html.replace('holder', 'status-message')
+        dom.$messages.append(newHtml);
+      } else {
+        dom.$messages.append(html);
+      }
       dom.$messages.scrollTop(dom.$messages[0].scrollHeight);
     });
   };
 
 
+
+
+  const updateChatDb = (name, msg, status) => {
+    let time = firebase.database.ServerValue.TIMESTAMP;
+
+    dB.chatRef.push({
+      name: name,
+      msg: msg,
+      time: time,
+      status: status
+    });
+  }
+
+
   // Displays input field and directions depending on if game in progress or not
-  const displayModal = function () {
+  const displayModal = () => {
+    let gData = dataCtrl.getGameData();
     if (gData.numPlayers === 2) {
       dom.$modalHeader.text('Game in progress, feel free to watch.')
     } else {
       dom.$modalHeader.text('Enter Your Name')
     }
-    // $('#modal1').modal();
-    $('#modal1').modal({
-      dismissible: false,
-      onOpenStart() {
-        outDuration: 300
-      }
-    })
-    $('#modal1').modal('open');
+
+    if (gData.playerName.length === 0) {
+      $('#modal1').modal({
+        dismissible: false,
+        onOpenStart() {
+          outDuration: 300
+        }
+      })
+      $('#modal1').modal('open');
+    }
   }
 
 
 
   // Adds message database
   const addChatMsg = () => {
-
-    console.log(gData.playerName)
     let msg = dom.$chatText.val();
 
     if (msg.length > 0) {
-      dB.chatRef.push(msg); /// need to figure out how to add name of player and time during push
+      updateChatDb(gData.chatName, msg, false)
       dom.$chatText.val('');
     }
   };
 
+
+
+  const checkPlayerName = () => {
+    var name = dom.$nameInput.val().trim();
+
+    if (name.length > 0 && name.includes('/') === false) {
+      gData.playerName = name;
+      gData.chatName = name;
+      dom.$nameInput.val('');
+      assignPlayerName(gData.playerName);
+    }
+  }
 
   /*
   Assigns the username that is passed as an argument to the player 1 or 2 
@@ -222,17 +261,35 @@ const appController = (function (dataCtrl, uiCtrl) {
   */
   const assignPlayerName = (name) => {
     let gData = dataCtrl.getGameData();
-
-    if (gData.numPlayers < 2) {
+    let timeNow = Date.now();
+    let dbDisconnect = firebase.database().ref('/chat/' + timeNow)
+    if (gData.numPlayers <= 1) {
 
       if (!gData.p1Presence) {
+
         dB.p1Ref.set({
           name: name,
           wins: 0,
           losses: 0,
           choice: ''
         });
-        dB.p1Ref.onDisconnect().remove();
+
+        dB.chatRef.push({
+          name: name,
+          msg: 'Has joined the game.',
+          time: firebase.database.ServerValue.TIMESTAMP,
+          status: true
+        });
+
+        dB.p1Ref.onDisconnect().remove()
+
+        dbDisconnect.onDisconnect().set({
+          name: name,
+          msg: 'Has left from the game.',
+          time: firebase.database.ServerValue.TIMESTAMP,
+          status: true
+        });
+
       } else if (!gData.p2Presence) {
 
         dB.p2Ref.set({
@@ -241,12 +298,25 @@ const appController = (function (dataCtrl, uiCtrl) {
           losses: 0,
           choice: ''
         });
-        dB.p2Ref.onDisconnect().remove();
-      }
 
-    } else {
-      html = '<p>too many players</p>'
-      $('.title').append(html);
+        dB.chatRef.push({
+          name: name,
+          msg: 'Has joined the game.',
+          time: firebase.database.ServerValue.TIMESTAMP,
+          disconnected: true
+        });
+
+        dB.p2Ref.onDisconnect().remove();
+        dbDisconnect.onDisconnect().set({
+          name: name,
+          msg: 'Has left from the game.',
+          time: firebase.database.ServerValue.TIMESTAMP,
+          disconnected: true
+        })
+      }
+    }
+    if (gData.numPlayers === 2) {
+      gData.playerName = '';
     }
   };
 

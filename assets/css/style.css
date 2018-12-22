@@ -75,10 +75,11 @@ html {
 
 #messages {
   padding-left: 33px;
-  padding-right: 33px;
+  padding-right: 5px;
   overflow-y: scroll;
   height: 170px;
   width: 780px;
+  margin-right: 0;
 }
 
 #message-text {
@@ -123,12 +124,18 @@ html {
   transition: .7s;
 }
 
+
 .chat-message:hover span {
   color: black;
   font-weight: 700;
   transition: .7s;
   background-color: rgb(218, 218, 218);
 }
+
+.status-message {
+  background-color: rgba(231, 231, 231, 0.452);
+}
+
 
 .send-btn {
   width: 50px;
