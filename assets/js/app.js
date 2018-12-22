@@ -38,7 +38,8 @@ const dataController = (function () {
     p2Wins: 0,
     p1Choice: '',
     p2Choice: '',
-    numPlayers: 0
+    numPlayers: 0,
+    playerName: ''
   }
 
 
@@ -112,6 +113,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
   const setupEventListeners = () => {
 
+
     // Click event listener in order to add a new chat message
     dom.$sendBtn.on('click', addChatMsg);
 
@@ -127,11 +129,11 @@ const appController = (function (dataCtrl, uiCtrl) {
     dom.$startBtn.on('click', () => {
 
       let gD = dataCtrl.getGameData();
-      let playerName = dom.$nameInput.val();
+      gData.playerName = dom.$nameInput.val().trim();
 
-      if (playerName.length > 0) {
+      if (gData.playerName.length > 0) {
         dom.$nameInput.val('');
-        assignPlayerName(playerName);
+        assignPlayerName(gData.playerName);
       }
     });
   };
@@ -175,8 +177,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     // On listener if a chat message has been sent
     dB.chatRef.on('child_added', (snap) => {
 
-      console.log()
-      let html = `<p>${snap.val()}</p>`; /// need to figure out how to add name of player and time during append
+      let html = `<span></span><p class='animated fadeIn chat-message'>${snap.val()}<span class='chat-date'></p>`;
       dom.$messages.append(html);
       dom.$messages.scrollTop(dom.$messages[0].scrollHeight);
     });
@@ -202,9 +203,10 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-  // Adds message to UI and database
+  // Adds message database
   const addChatMsg = () => {
 
+    console.log(gData.playerName)
     let msg = dom.$chatText.val();
 
     if (msg.length > 0) {
