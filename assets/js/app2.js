@@ -9,6 +9,7 @@ const config = {
 
 firebase.initializeApp(config);
 
+
 // Data Controller
 const dataController = (function () {
 
@@ -23,22 +24,14 @@ const dataController = (function () {
     p2Ref: dB.ref('/players/p2'),
     turnRef: dB.ref('turn'),
     connectedRef: dB.ref(".info/connected"),
-    p1Wins: dB.ref('p1Wins'),
-    p2Wins: dB.ref('p2Wins')
+    connectionsRef: dB.ref("connections")
   }
 
   let gameData = {
     p1Presence: false,
     p2Presence: false,
     p1Data: {},
-    p2Data: {},
-    p1Name: '',
-    p2Name: '',
-    p1Wins: 0,
-    p2Wins: 0,
-    p1Choice: '',
-    p2Choice: '',
-    numPlayers: 0
+    p2Data: {}
   }
 
 
@@ -64,7 +57,6 @@ const dataController = (function () {
 const uiController = (function () {
 
   const cacheDOM = {
-    $modalHeader: $('.modal-header'),
     $sendBtn: $('.send-btn'),
     $chatText: $('#textarea2'),
     $messages: $('#messages'),
@@ -74,8 +66,7 @@ const uiController = (function () {
     $p1Content: $('.p1-content'),
     $p2Content: $('.p2-content'),
     $p1Header: $('.player-1'),
-    $p2Header: $('.player-2'),
-    $title: $('.title')
+    $p2Header: $('.player-2')
   }
 
 
@@ -140,65 +131,39 @@ const appController = (function (dataCtrl, uiCtrl) {
 
   const setupOnListeners = () => {
 
-
+    // On listener for presence of players
     dB.playersRef.on('value', (snap) => {
+
       gData.p1Presence = snap.child('p1').exists();
       gData.p2Presence = snap.child('p2').exists();
 
-      gData.p1Data = snap.child('p1').val()
-      gData.p2Data = snap.child('p2').val()
+      p1Name = snap.child('p1').child('name').val()
+      p2Name = snap.child('p2').child('name').val()
 
-      gData.numPlayers = snap.numChildren()
 
-      displayModal();
+      console.log('check')
 
-      if (gData.p1Presence) {
-        uiCtrl.displayPlayerContent(gData.p1Data.name, dom.$p1Header);
-      }
-
-      if (gData.p2Presence) {
+      if (gData.p1Presence === true && gData.p2Presence === false) {
+        uiCtrl.displayPlayerContent(p1Name, dom.$p1Header);
+        uiCtrl.displayPlayerContent('Player 2', dom.$p2Header)
+      } else if (gData.p1Presence === false && gData.p2Presence === true) {
         uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
+        uiCtrl.displayPlayerContent('Player 1', dom.$p1Header)
+        // uiCtrl.displayPlayerContent(false, true);
+      } else {
+        console.log('start game')
       }
-
     });
 
 
-    ///// use this to display the disconnected alert in chat
-    dB.playersRef.on('child_removed', (snap) => {
 
-
-      console.log(snap.val())
-    })
-
-
-
-    // On listener if a chat message has been sent
+    // On listener for if a chat message has been sent
     dB.chatRef.on('child_added', (snap) => {
-
-      console.log()
       let html = `<p>${snap.val()}</p>`; /// need to figure out how to add name of player and time during append
       dom.$messages.append(html);
       dom.$messages.scrollTop(dom.$messages[0].scrollHeight);
     });
   };
-
-
-  // Displays input field and directions depending on if game in progress or not
-  const displayModal = function () {
-    if (gData.numPlayers === 2) {
-      dom.$modalHeader.text('Game in progress, feel free to watch.')
-    } else {
-      dom.$modalHeader.text('Enter Your Name')
-    }
-    // $('#modal1').modal();
-    $('#modal1').modal({
-      dismissible: false,
-      onOpenStart() {
-        outDuration: 300
-      }
-    })
-    $('#modal1').modal('open');
-  }
 
 
 
@@ -221,36 +186,42 @@ const appController = (function (dataCtrl, uiCtrl) {
   const assignPlayerName = (name) => {
     let gData = dataCtrl.getGameData();
 
-    if (gData.numPlayers < 2) {
+    dB.connectedRef.on('value', (snap) => {
+      if (snap.val() === true) {
 
-      if (!gData.p1Presence) {
-        dB.p1Ref.set({
-          name: name,
-          wins: 0,
-          losses: 0,
-          choice: ''
-        });
-        dB.p1Ref.onDisconnect().remove();
-      } else if (!gData.p2Presence) {
+        if (!gData.p1Presence) {
 
-        dB.p2Ref.set({
-          name: name,
-          wins: 0,
-          losses: 0,
-          choice: ''
-        });
-        dB.p2Ref.onDisconnect().remove();
+          // gData.p1Name = name;
+
+          dB.p1Ref.set({
+            name: name,
+            wins: 0,
+            losses: 0,
+            choice: ''
+          });
+
+          dB.p1Ref.onDisconnect().remove();
+
+        } else if (!gData.p2Presence) {
+
+          // gData.p2Name = name;
+
+          dB.p2Ref.set({
+            name: name,
+            wins: 0,
+            losses: 0,
+            choice: ''
+          });
+
+          dB.p2Ref.onDisconnect().remove();
+        } else {
+          html = '<p>too many players</p>'
+          $('.title').append(html);
+        }
       }
+    });
 
-    } else {
-      html = '<p>too many players</p>'
-      $('.title').append(html);
-    }
   };
-
-
-
-  // const resetPlayerData
 
 
 

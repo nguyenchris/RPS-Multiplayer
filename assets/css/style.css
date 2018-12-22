@@ -9,8 +9,25 @@ html {
   height: 200px;
 } */
 
+
 .title {
   text-align: center;
+}
+
+.name-field {
+  margin-bottom: 0;
+}
+
+.start-btn {
+  text-align: center;
+}
+
+#player-row {
+  margin-top: 35px;
+}
+
+.player-name {
+  font-size: 2.5em;
 }
 
 .profile-img {
