@@ -40,41 +40,13 @@
             </div>
           </div>
         </form>
-        <!-- <a class="waves-effect waves-light btn-small start-btn modal-close">Start</a> -->
       </div>
       <a class="waves-effect waves-light btn-small start-btn pulse modal-close">Start</a>
     </div>
   </div>
 
 
-  <div class="container">
-
-
-
-
-    <!-- <div class="row title">
-      <form class="col s12">
-        <div class="row">
-          <div class="input-field col s12">
-            <textarea id="textarea1" class="materialize-textarea name-input"></textarea>
-            <label for="textarea1">Name</label>
-          </div>
-        </div>
-      </form>
-      <a class="waves-effect waves-light btn-small start-btn">Start</a>
-    </div> -->
-    <!-- 
-    <div class="row title">
-      <form id="name-input">
-        <div class="col s12">
-          <div class="input-field inline">
-            <input id="name_inline name_text_input" type="text" class="validate">
-            <label for="name_inline">Name</label>
-            <a class="waves-effect waves-light btn-small start-btn">Start</a>
-          </div>
-        </div>
-      </form>
-    </div> -->
+  <div class="container" id="container">
 
 
     <div class="row" id="player-row">
@@ -83,18 +55,13 @@
         <div class="indeterminate"></div>
       </div> -->
 
-      <div class="col s4">
+      <div class="col s3" id="p1-col">
         <h3 class="header player-1 player-name">Player 1</h3>
-        <div class="card horizontal player-card">
-          <div class="card-image">
-            <img src="assets/images/profile.png" class="profile-img">
-          </div>
+        <div class="card horizontal player-card hoverable">
           <div class="card-stacked">
             <div class="card-content p1-content">
-              <p>Waiting for Player 1...</p>
-
             </div>
-            <div class="card-action">
+            <div class="card-action player-action p1-action">
               <a class="waves-effect waves-light btn rock-btn">Rock</a>
               <a class="waves-effect waves-light btn paper-btn">Paper</a>
               <a class="waves-effect waves-light btn scissors-btn">Scissors</a>
@@ -104,17 +71,31 @@
       </div>
 
 
-      <div class="col s4 m4">
-        <h3 class="header player-2 player-name">Player 1</h3>
-        <div class="card horizontal player-card">
-          <div class="card-image">
-            <img src="assets/images/profile.png" class="profile-img" id="p2">
+
+
+      <div class="col s6" id="game-col">
+        <div class="card game-card">
+          <div class="card-content">
+            <span class="card-title game-status">Card Title</span>
           </div>
+          <div class="card-action">
+          <img src="assets/images/paper.jpg" alt="Paper" class="choice">
+          <img src="assets/images/rock.jpg" alt="Rock">
+          <!-- <img src="assets/images/scissors.jpg" alt="Scissors"> -->
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="col s3" id="p2-col">
+        <h3 class="header player-2 player-name">Player 2</h3>
+        <div class="card horizontal player-card hoverable">
           <div class="card-stacked">
             <div class="card-content p2-content">
-              <p>Waiting for Player 2...</p>
             </div>
-            <div class="card-action">
+            <div class="card-action player-action p2-action">
               <a class="waves-effect waves-light btn rock-btn">Rock</a>
               <a class="waves-effect waves-light btn paper-btn">Paper</a>
               <a class="waves-effect waves-light btn scissors-btn">Scissors</a>
@@ -124,12 +105,12 @@
       </div>
     </div>
 
+
+
+
     <div class="section">
       <div class="row">
         <div class="col s12">
-          <!-- <img src="assets/images/paper.jpg" alt="Paper">
-          <img src="assets/images/rock.jpg" alt="Rock">
-          <img src="assets/images/scissors.jpg" alt="Scissors"> -->
         </div>
       </div>
     </div>
@@ -144,17 +125,16 @@
 
 
 
-    <div class="section">
+    <div class="section" id="message-section">
       <div class="row">
-        <div class="col s12 m5">
+        <div class="col s12">
           <div class="card message-card">
-            <div class="card-title">
+            <div class="card-title" id="message-header">
               <h4 class="message-title">Group Chat</h4>
             </div>
             <div class="divider"></div>
             <div class="card-content" id="message-content">
               <div id="messages">
-                <!-- implement hover effect where time fades or slides in of when sent -->
               </div>
               <div class="card-action" id="message-action">
                 <form id="message-form" action="#">

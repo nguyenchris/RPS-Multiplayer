@@ -3,11 +3,15 @@ html {
     sans-serif;
 }
 
+#container {
+  width: 85%;
+}
 
-/* .player-card {
-  width: 35%;
-  height: 200px;
-} */
+.player-card {
+  height: 190px;
+  width: 290px;
+  /* background-color: #b2dfdb; */
+}
 
 
 .title {
@@ -28,7 +32,19 @@ html {
 
 .player-name {
   font-size: 2.5em;
+  text-align: center;
 }
+
+.p1-content {
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.p2-content {
+  text-align: center;
+  font-size: 1.2em;
+}
+
 
 .profile-img {
   height: 50px;
@@ -36,29 +52,66 @@ html {
   margin-top: 50%;
 }
 
+.player-action {
+  padding-right: 18px;
+  padding-left: 18px;
+  text-align: center;
+}
+
 
 .rock-btn,
 .paper-btn,
 .scissors-btn {
-  padding-left: 12px;
-  padding-right: 10px;
+  padding-left: 7px;
+  padding-right: 7px;
   text-align: center;
+  font-size: .75em;
+  height: 32px;
+}
+
+#game-col {
+  width: 50%;
+  padding-left: 8px;
+}
+
+.game-card {
+  width: 90%;
+  margin: auto;
+  margin-top: 30px;
+  height: 300px;
+}
+
+#p2-col {
+  float: right;
+}
+
+
+#message-section {
+  padding-top: 30px;
 }
 
 .message-card {
-  position: absolute;
+  /* position: absolute;
   top: 75%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%); */
+  margin: auto;
   width: 800px;
   padding: 0px;
 }
 
+#message-header {
+  height: 30px;
+}
 
 .message-title {
   padding-left: 25px;
   text-align: center;
   font-size: 1em;
+  height: 30px;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-top: 3px;
 }
 
 #message-content {
@@ -77,7 +130,7 @@ html {
   padding-left: 33px;
   padding-right: 5px;
   overflow-y: scroll;
-  height: 170px;
+  height: 190px;
   width: 780px;
   margin-right: 0;
 }
@@ -97,7 +150,7 @@ html {
 }
 
 #textarea2 {
-  padding-top: 0;
+  padding-bottom: 0;
   margin-bottom: 0;
 }
 

@@ -80,7 +80,9 @@ const uiController = (function () {
     $p2Header: $('.player-2'),
     $title: $('.title'),
     $modal: $('#modal1'),
-    $nameForm: $('#name-form')
+    $nameForm: $('#name-form'),
+    $p1Wins: $('#p1-wins'),
+    $p2Wins: $('#p2-wins')
   }
 
 
@@ -94,8 +96,17 @@ const uiController = (function () {
       selector.text(name);
     },
 
-    displayWaiting: function (player) {
+    // Displays 'waiting for...' in the player content card
+    displayWaiting: function (selector, player) {
+      let html = `Waiting for Player ${player}...`
+      selector.empty();
+      selector.append(html);
+    },
 
+    displayPlayerScore: function (selector) {
+      let html = `<p>Wins: <span id="p1-wins">0</span></p><p>Losses: <span id="p1-losses">0</span></p>`
+      selector.empty();
+      selector.append(html);
     }
   }
 
@@ -151,14 +162,18 @@ const appController = (function (dataCtrl, uiCtrl) {
       if (gData.numPlayers <= 2) {
         if (gData.p1Presence) {
           uiCtrl.displayPlayerContent(gData.p1Data.name, dom.$p1Header);
+          uiCtrl.displayPlayerScore(dom.$p1Content);
         } else {
           uiCtrl.displayPlayerContent('Player 1', dom.$p1Header);
+          uiCtrl.displayWaiting(dom.$p1Content, 1);
         }
 
         if (gData.p2Presence) {
           uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
+          uiCtrl.displayPlayerScore(dom.$p2Content);
         } else {
           uiCtrl.displayPlayerContent('Player 2', dom.$p2Header);
+          uiCtrl.displayWaiting(dom.$p2Content, 2);
         }
         displayModal();
       }
@@ -169,7 +184,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     // On listener if a chat message has been sent
     dB.chatRef.orderByChild('time').on('child_added', (snap) => {
       let chatObj = snap.val();
-      let status = chatObj.status
+      let status = chatObj.status;
       let time = moment(chatObj.time).calendar()
       let html = `<p class='animated fadeIn chat-message holder'><span class='chat-name'>${chatObj.name}: </span>${chatObj.msg}<span class='chat-date'>${time}</span></p>`;
 
