@@ -133,7 +133,8 @@ html {
 }
 
 .status-message {
-  background-color: rgba(231, 231, 231, 0.452);
+  /* background-color: rgba(231, 231, 231, 0.24); */
+  color: rgba(180, 180, 180, 0.664);
 }
 
 

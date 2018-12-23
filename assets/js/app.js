@@ -116,7 +116,6 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-
   const setupEventListeners = () => {
 
     // Click event listener in order to add a new chat message
@@ -136,11 +135,11 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-
   const setupOnListeners = () => {
 
 
     dB.playersRef.on('value', (snap) => {
+      gData = dataCtrl.getGameData();
       gData.p1Presence = snap.child('p1').exists();
       gData.p2Presence = snap.child('p2').exists();
 
@@ -164,17 +163,6 @@ const appController = (function (dataCtrl, uiCtrl) {
         displayModal();
       }
     });
-
-
-    ///// use this to display the disconnected alert in chat
-    // dB.playersRef.on('child_removed', (snap) => {
-
-    //   let name = snap.child('name').val()
-    //   let msg = 'Has disconnected from the game.'
-    //   dB.chatRef.push(name)
-
-    //   updateChatDb(name, msg, true)
-    // })
 
 
 
@@ -246,6 +234,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
   const checkPlayerName = () => {
     var name = dom.$nameInput.val().trim();
+    let gData = dataCtrl.getGameData();
 
     if (name.length > 0 && name.includes('/') === false) {
       gData.playerName = name;
@@ -303,7 +292,7 @@ const appController = (function (dataCtrl, uiCtrl) {
           name: name,
           msg: 'Has joined the game.',
           time: firebase.database.ServerValue.TIMESTAMP,
-          disconnected: true
+          status: true
         });
 
         dB.p2Ref.onDisconnect().remove();
@@ -311,12 +300,13 @@ const appController = (function (dataCtrl, uiCtrl) {
           name: name,
           msg: 'Has left from the game.',
           time: firebase.database.ServerValue.TIMESTAMP,
-          disconnected: true
+          status: true
         })
       }
     }
     if (gData.numPlayers === 2) {
       gData.playerName = '';
+      gData.chatName = name + ' (spectator)'
     }
   };
 
