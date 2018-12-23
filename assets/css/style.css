@@ -4,7 +4,7 @@ html {
 }
 
 #container {
-  width: 85%;
+  width: 90%;
 }
 
 .player-card {
@@ -46,12 +46,6 @@ html {
 }
 
 
-.profile-img {
-  height: 50px;
-  margin-left: 10px;
-  margin-top: 50%;
-}
-
 .player-action {
   padding-right: 18px;
   padding-left: 18px;
@@ -71,14 +65,23 @@ html {
 
 #game-col {
   width: 50%;
-  padding-left: 8px;
+  /* padding-left: 8px; */
 }
 
 .game-card {
-  width: 90%;
+  width: 80%;
   margin: auto;
   margin-top: 30px;
   height: 300px;
+}
+
+#game-title {
+  text-align: center;
+  padding-top: 0px;
+}
+
+.choice {
+  height: 120px;
 }
 
 #p2-col {

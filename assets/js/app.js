@@ -9,6 +9,7 @@ const config = {
 
 firebase.initializeApp(config);
 
+
 // Data Controller
 const dataController = (function () {
 
@@ -18,10 +19,11 @@ const dataController = (function () {
   // Object containing database references
   const dbRef = {
     chatRef: dB.ref('/chat'),
+    gameStart: dB.ref('/gamestart'),
     playersRef: dB.ref('players'),
     p1Ref: dB.ref('/players/p1'),
     p2Ref: dB.ref('/players/p2'),
-    turnRef: dB.ref('turn'),
+    turnRef: dB.ref('/turn'),
     connectedRef: dB.ref(".info/connected"),
     p1Wins: dB.ref('p1Wins'),
     p2Wins: dB.ref('p2Wins')
@@ -98,7 +100,7 @@ const uiController = (function () {
 
     // Displays 'waiting for...' in the player content card
     displayWaiting: function (selector, player) {
-      let html = `Waiting for Player ${player}...`
+      let html = `<p>Waiting for Player ${player}...</p>`
       selector.empty();
       selector.append(html);
     },
@@ -142,6 +144,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
     // Start button click event listener to add player to game
     dom.$startBtn.on('click', checkPlayerName)
+
   };
 
 
@@ -150,7 +153,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
     dB.playersRef.on('value', (snap) => {
-      gData = dataCtrl.getGameData();
+
       gData.p1Presence = snap.child('p1').exists();
       gData.p2Presence = snap.child('p2').exists();
 
@@ -158,6 +161,10 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.p2Data = snap.child('p2').val();
 
       gData.numPlayers = snap.numChildren();
+
+      if (gData.numPlayers === 0) {
+        dB.gameStart.set(false);
+      }
 
       if (gData.numPlayers <= 2) {
         if (gData.p1Presence) {
@@ -196,6 +203,28 @@ const appController = (function (dataCtrl, uiCtrl) {
       }
       dom.$messages.scrollTop(dom.$messages[0].scrollHeight);
     });
+
+
+
+    dB.playersRef.on('child_added', (snap) => {
+
+      console.log(gData.numPlayers);
+
+      // if (playerAmount === 2) {
+      //   dB.gameStart.set('true')
+      // }
+    });
+
+    dB.gameStart.on('value', (snap) => {
+      let game = snap.val();
+      if(gData.numPlayers < 2) {
+        dB.gameStart.set('false')
+      } else {
+        console.log('hi');
+      }
+    });
+
+
   };
 
 
@@ -217,7 +246,7 @@ const appController = (function (dataCtrl, uiCtrl) {
   const displayModal = () => {
     let gData = dataCtrl.getGameData();
     if (gData.numPlayers === 2) {
-      dom.$modalHeader.text('Game in progress, feel free to watch.')
+      dom.$modalHeader.text('Game in progress. Feel free to watch and chat until another player leaves.')
     } else {
       dom.$modalHeader.text('Enter Your Name')
     }
@@ -230,6 +259,8 @@ const appController = (function (dataCtrl, uiCtrl) {
         }
       })
       $('#modal1').modal('open');
+    } else {
+      $('#modal1').modal('close');
     }
   }
 
@@ -252,6 +283,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     let gData = dataCtrl.getGameData();
 
     if (name.length > 0 && name.includes('/') === false) {
+      dom.$startBtn.addClass('modal-close')
       gData.playerName = name;
       gData.chatName = name;
       dom.$nameInput.val('');
@@ -267,7 +299,11 @@ const appController = (function (dataCtrl, uiCtrl) {
     let gData = dataCtrl.getGameData();
     let timeNow = Date.now();
     let dbDisconnect = firebase.database().ref('/chat/' + timeNow)
-    if (gData.numPlayers <= 1) {
+    console.log('numPlayers: ' + gData.numPlayers)
+    if (gData.numPlayers < 2) {
+
+      // if (gData.p1Presence === false && gData.p2Presence === true)
+
 
       if (!gData.p1Presence) {
 
@@ -318,8 +354,7 @@ const appController = (function (dataCtrl, uiCtrl) {
           status: true
         })
       }
-    }
-    if (gData.numPlayers === 2) {
+    } else if (gData.numPlayers === 2) {
       gData.playerName = '';
       gData.chatName = name + ' (spectator)'
     }

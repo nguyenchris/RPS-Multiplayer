@@ -30,7 +30,7 @@
 
   <div id="modal1" class="modal top-sheet">
     <div class="modal-content title">
-      <h2 class="modal-header">Enter Your Name</h2>
+      <h4 class="modal-header">Enter Your Name</h4>
       <div class="row title">
         <form class="col s12 close-modal" id="name-form">
           <div class="row name-field">
@@ -41,7 +41,7 @@
           </div>
         </form>
       </div>
-      <a class="waves-effect waves-light btn-small start-btn pulse modal-close">Start</a>
+      <a class="waves-effect waves-light btn-small start-btn pulse">Start</a>
     </div>
   </div>
 
@@ -75,12 +75,13 @@
 
       <div class="col s6" id="game-col">
         <div class="card game-card">
-          <div class="card-content">
-            <span class="card-title game-status">Card Title</span>
+          <div class="card-content" id="game-title">
+            <!-- <span class="card-title game-status">Card Title</span> -->
+            <p class="card-title game-status">Title</p>
           </div>
           <div class="card-action">
-          <img src="assets/images/paper.jpg" alt="Paper" class="choice">
-          <img src="assets/images/rock.jpg" alt="Rock">
+          <img src="assets/images/paper.jpg" alt="Paper" class="choice p1-choice">
+          <img src="assets/images/rock.jpg" alt="Rock" class="choice p1-choice">
           <!-- <img src="assets/images/scissors.jpg" alt="Scissors"> -->
           </div>
         </div>
@@ -101,16 +102,6 @@
               <a class="waves-effect waves-light btn scissors-btn">Scissors</a>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
-
-
-
-
-    <div class="section">
-      <div class="row">
-        <div class="col s12">
         </div>
       </div>
     </div>
