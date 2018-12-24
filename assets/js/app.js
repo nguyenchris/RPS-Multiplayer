@@ -115,8 +115,8 @@ const uiController = (function () {
       selector.append(html);
     },
 
-    displayPlayerScore: function (selector) {
-      let html = `<p class="#26a69a teal lighten-1">Wins: <span id="p1-wins">0</span></p><p class="#c62828 red darken-3">Losses: <span id="p1-losses">0</span></p>`
+    displayPlayerScore: function (selector, wins, losses) {
+      let html = `<p class="#26a69a teal lighten-1">Wins: <span id="p1-wins">${wins}</span></p><p class="#c62828 red darken-3">Losses: <span id="p1-losses">${losses}</span></p>`
       selector.empty();
       selector.append(html);
     },
@@ -242,7 +242,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       if (gData.numPlayers <= 2) {
         if (gData.p1Presence) {
           uiCtrl.displayPlayerContent(gData.p1Data.name, dom.$p1Header);
-          uiCtrl.displayPlayerScore(dom.$p1Content);
+          uiCtrl.displayPlayerScore(dom.$p1Content, gData.p1Data.wins, gData.p1Data.losses);
         } else {
           uiCtrl.displayPlayerContent('Player 1', dom.$p1Header);
           uiCtrl.displayWaiting(dom.$p1Content, 1);
@@ -250,7 +250,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
         if (gData.p2Presence) {
           uiCtrl.displayPlayerContent(gData.p2Data.name, dom.$p2Header);
-          uiCtrl.displayPlayerScore(dom.$p2Content);
+          uiCtrl.displayPlayerScore(dom.$p2Content, gData.p2Data.wins, gData.p2Data.losses);
         } else {
           uiCtrl.displayPlayerContent('Player 2', dom.$p2Header);
           uiCtrl.displayWaiting(dom.$p2Content, 2);
@@ -312,16 +312,12 @@ const appController = (function (dataCtrl, uiCtrl) {
 
         dom.$gameStatus.empty();
 
-        console.log(gData.p1Data.choice);
-        console.log(gData.p2Data.choice);
-
         uiCtrl.displayPlayerChoice(1, gData.p1Data.choice);
         uiCtrl.displayPlayerChoice(2, gData.p2Data.choice);
 
         // checkGame(gData.p1Data.choice, gData.p2Data.choice);
 
         setTimeout(nextRound, 5000);
-
 
       }
 
@@ -338,9 +334,9 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-  // const checkGame = (p1, p2) => {
-
-  // }
+  const checkGame = (p1, p2) => {
+    
+  }
 
 
 

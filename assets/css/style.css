@@ -111,7 +111,8 @@ html {
   animation-name: moveInRight;
   animation-duration: .9s;
   animation-timing-function: ease-out;
-  transform: scaleX(-1);
+  animation-fill-mode: forwards;
+  /* transform: scaleX(-1); */
 }
 
 .option-area {
@@ -123,20 +124,24 @@ html {
   0% {
     opacity: 0;
     transform: translateX(-280px);
+    transform: scaleX(-1)
   }
 
   50% {
     opacity: .1;
+    /* transform: scaleX(-1) */
   }
 
   80% {
     opacity: .4;
     transform: translateX(150px);
+    /* transform: scaleX(-1) */
   }
 
   100% {
     opacity: 1;
-    transform: translateX(0)
+    transform: translateX(0);
+    transform: scaleX(-1)
   }
 }
 
@@ -145,15 +150,18 @@ html {
   0% {
     opacity: 0;
     transform: translateX(280px);
+    transform: scaleX(-1);
   }
 
   50% {
     opacity: .1;
+    /* transform: scaleX(-1); */
   }
 
   80% {
     opacity: .4;
     transform: translateX(-150px);
+    /* transform: scaleX(-1); */
   }
 
   100% {
