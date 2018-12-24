@@ -92,7 +92,9 @@ const uiController = (function () {
     $p2Action: $('.p2-action'),
     $gameStatus: $('.game-status'),
     $p1Card: $('#p1-card'),
-    $p2Card: $('#p2-card')
+    $p2Card: $('#p2-card'),
+    $p1Option: $('.p1-option'),
+    $p2Option: $('.p2-option')
   }
 
 
@@ -114,7 +116,7 @@ const uiController = (function () {
     },
 
     displayPlayerScore: function (selector) {
-      let html = `<p>Wins: <span id="p1-wins">0</span></p><p>Losses: <span id="p1-losses">0</span></p>`
+      let html = `<p class="#26a69a teal lighten-1">Wins: <span id="p1-wins">0</span></p><p class="#c62828 red darken-3">Losses: <span id="p1-losses">0</span></p>`
       selector.empty();
       selector.append(html);
     },
@@ -152,6 +154,21 @@ const uiController = (function () {
         cacheDOM.$p2Card.css('background-color', '#fff');
         cacheDOM.$p1Card.css('background-color', '#fff');
       }
+    },
+
+    displayPlayerChoice: function (player, choice) {
+
+      let img = $("<img class='choice p" + player + "-choice'>").attr(
+        'src',
+        "assets/images/" + choice + ".jpg"
+      );
+
+      if (player == 1) {
+        cacheDOM.$p1Option.append(img);
+      } else {
+        cacheDOM.$p2Option.append(img);
+      }
+
     }
   }
 
@@ -189,10 +206,15 @@ const appController = (function (dataCtrl, uiCtrl) {
     dom.$startBtn.on('click', checkPlayerName);
 
     // Click Listener to determine what choice the user selects
-    $(document).on('click', '.option', function() {
-      let choice = $(this).attr('data-choice')
+    $(document).on('click', '.option', function () {
+      let choice = $(this).attr('data-choice');
 
       gData.pRef.child('choice').set(choice);
+
+      $('.p' + gData.playerNum + '-action').empty()
+      gData.currentTurn++
+      dB.turnRef.set(gData.currentTurn);
+
     });
 
   };
@@ -211,6 +233,11 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.p2Data = snap.child('p2').val();
 
       gData.numPlayers = snap.numChildren();
+      
+
+      if (gData.p1Presence === false && gData.p2Presence === false) {
+        dB.turnRef.set(0);
+      }
 
       if (gData.numPlayers <= 2) {
         if (gData.p1Presence) {
@@ -242,7 +269,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       let html = `<p class='animated fadeIn chat-message holder'><span class='chat-name'>${chatObj.name}: </span>${chatObj.msg}<span class='chat-date'>${time}</span></p>`;
 
       if (status) {
-        let newHtml = html.replace('holder', 'status-message')
+        let newHtml = html.replace('holder', 'status-message');
         dom.$messages.append(newHtml);
       } else {
         dom.$messages.append(html);
@@ -278,11 +305,24 @@ const appController = (function (dataCtrl, uiCtrl) {
         } else {
           uiCtrl.displayWaitingInGame(gData.p2Data.name);
         }
-  
+
         uiCtrl.changePlayerBg(2);
 
       } else if (gData.currentTurn === 3) {
-        console.log('hi')
+
+        dom.$gameStatus.empty();
+
+        console.log(gData.p1Data.choice);
+        console.log(gData.p2Data.choice);
+
+        uiCtrl.displayPlayerChoice(1, gData.p1Data.choice);
+        uiCtrl.displayPlayerChoice(2, gData.p2Data.choice);
+
+        // checkGame(gData.p1Data.choice, gData.p2Data.choice);
+
+        setTimeout(nextRound, 5000);
+
+
       }
 
 
@@ -295,6 +335,25 @@ const appController = (function (dataCtrl, uiCtrl) {
       }
     });
   };
+
+
+
+  // const checkGame = (p1, p2) => {
+
+  // }
+
+
+
+  const nextRound = () => {
+    dom.$p1Option.empty();
+    dom.$p2Option.empty();
+
+    if (gData.p1Presence && gData.p1Presence) {
+      dB.turnRef.set(1);
+    } else {
+      dB.turnRef.set(0);
+    }
+  }
 
 
 
@@ -352,7 +411,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     let gData = dataCtrl.getGameData();
 
     if (name.length > 0 && name.includes('/') === false) {
-      dom.$startBtn.addClass('modal-close')
+      dom.$startBtn.addClass('modal-close');
       gData.playerName = name;
       gData.chatName = name;
       dom.$nameInput.val('');
@@ -428,15 +487,10 @@ const appController = (function (dataCtrl, uiCtrl) {
         })
       }
     } else if (gData.numPlayers === 2) {
-      gData.playerName = 'Spectator';
+      gData.playerName = '';
       gData.chatName = name + ' (spectator)'
     }
   };
-
-
-
-  // const resetPlayerData
-
 
 
   return {
