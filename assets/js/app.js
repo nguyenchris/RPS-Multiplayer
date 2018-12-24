@@ -90,8 +90,8 @@ const uiController = (function () {
     $p1Action: $('.p1-action'),
     $p2Action: $('.p2-action'),
     $gameStatus: $('.game-status'),
-    $p1Card: $('.p1-card'),
-    $p2Card: $('.p2-card')
+    $p1Card: $('#p1-card'),
+    $p2Card: $('#p2-card')
   }
 
 
@@ -141,15 +141,15 @@ const uiController = (function () {
     },
 
     changePlayerBg: function (pNum) {
-      if (pNum === 1) {
-        $p1Card.css('background-color', '#b2dfdb');
-        $p2Card.css('background-color', '#fff')
-      } else if (pNum === 2) {
-        $p2Card.css('background-color', '#b2dfdb');
-        $p1Card.css('background-color', '#fff');
-      } else if (pNum === 3) {
-        $p2Card.css('background-color', '#fff');
-        $p1Card.css('background-color', '#fff');
+      if (pNum == 1) {
+        cacheDOM.$p1Card.css('background-color', '#b2dfdb');
+        cacheDOM.$p2Card.css('background-color', '#fff');
+      } else if (pNum == 2) {
+        cacheDOM.$p2Card.css('background-color', '#b2dfdb');
+        cacheDOM.$p1Card.css('background-color', '#fff');
+      } else if (pNum == 3) {
+        cacheDOM.$p2Card.css('background-color', '#fff');
+        cacheDOM.$p1Card.css('background-color', '#fff');
       }
     }
   }
@@ -185,7 +185,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     });
 
     // Start button click event listener to add player to game
-    dom.$startBtn.on('click', checkPlayerName)
+    dom.$startBtn.on('click', checkPlayerName);
 
   };
 
@@ -252,21 +252,31 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.currentTurn = snap.val();
 
       if (gData.currentTurn === 1) {
+
         if (gData.playerNum === 1) {
+
           uiCtrl.displayChoices(1);
           uiCtrl.displayTurn(gData.p1Data.name);
-          uiCtrl.changePlayerBg(1)
+
         } else {
           uiCtrl.displayWaitingInGame(gData.p1Data.name);
         }
+
+        uiCtrl.changePlayerBg(1)
+
       } else if (gData.currentTurn === 2) {
+
         if (gData.playerNum === 2) {
+
           uiCtrl.displayChoices(2);
           uiCtrl.displayTurn(gData.p2Data.name);
-          uiCtrl.changePlayerBg(2);
+
         } else {
           uiCtrl.displayWaitingInGame(gData.p2Data.name);
         }
+  
+        uiCtrl.changePlayerBg(2);
+        
       } else {
         console.log('choices')
       }
