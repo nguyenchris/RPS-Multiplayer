@@ -45,7 +45,8 @@ const dataController = (function () {
     gameStart: false,
     chatName: '',
     currentTurn: 0,
-    playerNum: 0
+    playerNum: 0,
+    pRef: ''
   }
 
 
@@ -120,7 +121,7 @@ const uiController = (function () {
 
     displayChoices: function (player) {
       let pNum = player;
-      let html = `<a class="waves-effect waves-light btn rock-btn hoverable" data-choice="rock">Rock</a><a class="waves-effect waves-light btn paper-btn hoverable" data-choice="paper">Paper</a><a class="waves-effect waves-light btn scissors-btn hoverable" data-choice="scissors">Scissors</a>`
+      let html = `<a class="waves-effect waves-light btn rock-btn hoverable option" data-choice="rock">Rock</a><a class="waves-effect waves-light btn paper-btn hoverable option" data-choice="paper">Paper</a><a class="waves-effect waves-light btn scissors-btn hoverable option" data-choice="scissors">Scissors</a>`
 
       if (pNum === 1) {
         cacheDOM.$p1Action.append(html);
@@ -187,6 +188,13 @@ const appController = (function (dataCtrl, uiCtrl) {
     // Start button click event listener to add player to game
     dom.$startBtn.on('click', checkPlayerName);
 
+    // Click Listener to determine what choice the user selects
+    $(document).on('click', '.option', function() {
+      let choice = $(this).attr('data-choice')
+
+      gData.pRef.child('choice').set(choice);
+    });
+
   };
 
 
@@ -203,10 +211,6 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.p2Data = snap.child('p2').val();
 
       gData.numPlayers = snap.numChildren();
-
-      if (gData.numPlayers === 0) {
-        dB.gameStart.set(false);
-      }
 
       if (gData.numPlayers <= 2) {
         if (gData.p1Presence) {
@@ -262,7 +266,7 @@ const appController = (function (dataCtrl, uiCtrl) {
           uiCtrl.displayWaitingInGame(gData.p1Data.name);
         }
 
-        uiCtrl.changePlayerBg(1)
+        uiCtrl.changePlayerBg(1);
 
       } else if (gData.currentTurn === 2) {
 
@@ -276,20 +280,20 @@ const appController = (function (dataCtrl, uiCtrl) {
         }
   
         uiCtrl.changePlayerBg(2);
-        
-      } else {
-        console.log('choices')
+
+      } else if (gData.currentTurn === 3) {
+        console.log('hi')
       }
-    })
+
+
+    });
 
 
     dB.playersRef.on('child_added', (snap) => {
       if (gData.numPlayers === 1) {
         dB.turnRef.set(1);
       }
-    })
-
-
+    });
   };
 
 
@@ -377,6 +381,8 @@ const appController = (function (dataCtrl, uiCtrl) {
           choice: ''
         });
 
+        gData.pRef = dB.p1Ref;
+
         dB.chatRef.push({
           name: name,
           msg: 'Has joined the game.',
@@ -403,6 +409,8 @@ const appController = (function (dataCtrl, uiCtrl) {
           losses: 0,
           choice: ''
         });
+
+        gData.pRef = dB.p2Ref;
 
         dB.chatRef.push({
           name: name,

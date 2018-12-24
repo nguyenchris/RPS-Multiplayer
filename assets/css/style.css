@@ -61,6 +61,8 @@ html {
   text-align: center;
   font-size: .75em;
   height: 32px;
+  margin-left: 3px;
+  margin-right: 3px;
 }
 
 #game-col {
@@ -78,6 +80,8 @@ html {
   text-align: center;
   padding-top: 5px;
   padding-bottom: 0px;
+  font-weight: 700;
+  color: #26a69a;
 }
 
 .choice {
