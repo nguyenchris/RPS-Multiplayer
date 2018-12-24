@@ -169,6 +169,10 @@ const uiController = (function () {
         cacheDOM.$p2Option.append(img);
       }
 
+    },
+
+    displayResult: function (name) {
+      cacheDOM.$gameStatus.text(`${name} Won!`);
     }
   }
 
@@ -211,7 +215,7 @@ const appController = (function (dataCtrl, uiCtrl) {
 
       gData.pRef.child('choice').set(choice);
 
-      $('.p' + gData.playerNum + '-action').empty()
+      $('.p' + gData.playerNum + '-action').empty();
       gData.currentTurn++
       dB.turnRef.set(gData.currentTurn);
 
@@ -233,10 +237,12 @@ const appController = (function (dataCtrl, uiCtrl) {
       gData.p2Data = snap.child('p2').val();
 
       gData.numPlayers = snap.numChildren();
-      
 
-      if (gData.p1Presence === false && gData.p2Presence === false) {
+
+      if (gData.p1Presence === false || gData.p2Presence === false) {
         dB.turnRef.set(0);
+        dom.$p1Action.empty();
+        dom.$p2Action.empty();
       }
 
       if (gData.numPlayers <= 2) {
@@ -315,10 +321,9 @@ const appController = (function (dataCtrl, uiCtrl) {
         uiCtrl.displayPlayerChoice(1, gData.p1Data.choice);
         uiCtrl.displayPlayerChoice(2, gData.p2Data.choice);
 
-        // checkGame(gData.p1Data.choice, gData.p2Data.choice);
+        setTimeout(checkGame, 900);
 
-        setTimeout(nextRound, 5000);
-
+        setTimeout(nextRound, 4500);
       }
 
 
@@ -334,8 +339,49 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-  const checkGame = (p1, p2) => {
-    
+  const checkGame = () => {
+    if (gData.p1Data.choice === 'rock' && gData.p2Data.choice === 'rock') {
+      tie();
+    } else if (gData.p1Data.choice === 'paper' && gData.p2Data.choice === 'paper') {
+      tie();
+    } else if (gData.p1Data.choice === 'scissors' && gData.p2Data.choice === 'scissors') {
+      tie();
+    } else if (gData.p1Data.choice === 'rock' && gData.p2Data.choice === 'paper') {
+      p2Won();
+    } else if (gData.p1Data.choice === 'rock' && gData.p2Data.choice === 'scissors') {
+      p1Won();
+    } else if (gData.p1Data.choice === 'paper' && gData.p2Data.choice === 'rock') {
+      p1Won();
+    } else if (gData.p1Data.choice === 'paper' && gData.p2Data.choice === 'scissors') {
+      p2Won();
+    } else if (gData.p1Data.choice === 'scissors' && gData.p2Data.choice === 'rock') {
+      p2Won();
+    } else if (gData.p1Data.choice === 'scissors' && gData.p2Data.choice === 'paper') {
+      p1Won();
+    }
+  }
+
+
+  const p1Won = () => {
+    uiCtrl.displayResult(gData.p1Data.name);
+
+    if (gData.playerNum === 1) {
+      dB.p1Ref.child('wins').set(gData.p1Data.wins + 1);
+      dB.p2Ref.child('losses').set(gData.p2Data.losses + 1);
+    }
+  }
+
+  const p2Won = () => {
+    uiCtrl.displayResult(gData.p2Data.name);
+
+    if (gData.playerNum === 2) {
+      dB.p2Ref.child('wins').set(gData.p2Data.wins + 1);
+      dB.p1Ref.child('losses').set(gData.p1Data.losses + 1);
+    }
+  }
+
+  const tie = () => {
+    dom.$gameStatus.text('Tie!');
   }
 
 
