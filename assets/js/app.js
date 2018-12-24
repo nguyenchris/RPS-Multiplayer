@@ -43,7 +43,9 @@ const dataController = (function () {
     numPlayers: 0,
     playerName: '',
     gameStart: false,
-    chatName: ''
+    chatName: '',
+    currentTurn: 0,
+    playerNum: 0
   }
 
 
@@ -84,7 +86,12 @@ const uiController = (function () {
     $modal: $('#modal1'),
     $nameForm: $('#name-form'),
     $p1Wins: $('#p1-wins'),
-    $p2Wins: $('#p2-wins')
+    $p2Wins: $('#p2-wins'),
+    $p1Action: $('.p1-action'),
+    $p2Action: $('.p2-action'),
+    $gameStatus: $('.game-status'),
+    $p1Card: $('.p1-card'),
+    $p2Card: $('.p2-card')
   }
 
 
@@ -109,6 +116,41 @@ const uiController = (function () {
       let html = `<p>Wins: <span id="p1-wins">0</span></p><p>Losses: <span id="p1-losses">0</span></p>`
       selector.empty();
       selector.append(html);
+    },
+
+    displayChoices: function (player) {
+      let pNum = player;
+      let html = `<a class="waves-effect waves-light btn rock-btn hoverable" data-choice="rock">Rock</a><a class="waves-effect waves-light btn paper-btn hoverable" data-choice="paper">Paper</a><a class="waves-effect waves-light btn scissors-btn hoverable" data-choice="scissors">Scissors</a>`
+
+      if (pNum === 1) {
+        cacheDOM.$p1Action.append(html);
+        cacheDOM.$p2Action.empty();
+      } else if (pNum === 2) {
+        cacheDOM.$p2Action.append(html);
+        cacheDOM.$p1Action.empty();
+      }
+    },
+
+
+    displayTurn: function (name) {
+      cacheDOM.$gameStatus.text(`Your Turn, ${name}!`);
+    },
+
+    displayWaitingInGame: function (name) {
+      cacheDOM.$gameStatus.text(`Waiting for ${name}'s selection...`);
+    },
+
+    changePlayerBg: function (pNum) {
+      if (pNum === 1) {
+        $p1Card.css('background-color', '#b2dfdb');
+        $p2Card.css('background-color', '#fff')
+      } else if (pNum === 2) {
+        $p2Card.css('background-color', '#b2dfdb');
+        $p1Card.css('background-color', '#fff');
+      } else if (pNum === 3) {
+        $p2Card.css('background-color', '#fff');
+        $p1Card.css('background-color', '#fff');
+      }
     }
   }
 
@@ -206,23 +248,36 @@ const appController = (function (dataCtrl, uiCtrl) {
 
 
 
-    dB.playersRef.on('child_added', (snap) => {
+    dB.turnRef.on('value', (snap) => {
+      gData.currentTurn = snap.val();
 
-      console.log(gData.numPlayers);
-
-      // if (playerAmount === 2) {
-      //   dB.gameStart.set('true')
-      // }
-    });
-
-    dB.gameStart.on('value', (snap) => {
-      let game = snap.val();
-      if(gData.numPlayers < 2) {
-        dB.gameStart.set('false')
+      if (gData.currentTurn === 1) {
+        if (gData.playerNum === 1) {
+          uiCtrl.displayChoices(1);
+          uiCtrl.displayTurn(gData.p1Data.name);
+          uiCtrl.changePlayerBg(1)
+        } else {
+          uiCtrl.displayWaitingInGame(gData.p1Data.name);
+        }
+      } else if (gData.currentTurn === 2) {
+        if (gData.playerNum === 2) {
+          uiCtrl.displayChoices(2);
+          uiCtrl.displayTurn(gData.p2Data.name);
+          uiCtrl.changePlayerBg(2);
+        } else {
+          uiCtrl.displayWaitingInGame(gData.p2Data.name);
+        }
       } else {
-        console.log('hi');
+        console.log('choices')
       }
-    });
+    })
+
+
+    dB.playersRef.on('child_added', (snap) => {
+      if (gData.numPlayers === 1) {
+        dB.turnRef.set(1);
+      }
+    })
 
 
   };
@@ -299,13 +354,11 @@ const appController = (function (dataCtrl, uiCtrl) {
     let gData = dataCtrl.getGameData();
     let timeNow = Date.now();
     let dbDisconnect = firebase.database().ref('/chat/' + timeNow)
-    console.log('numPlayers: ' + gData.numPlayers)
     if (gData.numPlayers < 2) {
 
-      // if (gData.p1Presence === false && gData.p2Presence === true)
-
-
       if (!gData.p1Presence) {
+
+        gData.playerNum = 1;
 
         dB.p1Ref.set({
           name: name,
@@ -332,6 +385,8 @@ const appController = (function (dataCtrl, uiCtrl) {
 
       } else if (!gData.p2Presence) {
 
+        gData.playerNum = 2;
+
         dB.p2Ref.set({
           name: name,
           wins: 0,
@@ -355,7 +410,7 @@ const appController = (function (dataCtrl, uiCtrl) {
         })
       }
     } else if (gData.numPlayers === 2) {
-      gData.playerName = '';
+      gData.playerName = 'Spectator';
       gData.chatName = name + ' (spectator)'
     }
   };
