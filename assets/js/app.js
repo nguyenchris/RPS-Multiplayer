@@ -27,8 +27,9 @@ const dataController = (function () {
     connectedRef: dB.ref(".info/connected"),
     p1Wins: dB.ref('p1Wins'),
     p2Wins: dB.ref('p2Wins')
-  }
+  };
 
+  // Local variables
   let gameData = {
     p1Presence: false,
     p2Presence: false,
@@ -36,10 +37,6 @@ const dataController = (function () {
     p2Data: {},
     p1Name: '',
     p2Name: '',
-    p1Wins: 0,
-    p2Wins: 0,
-    p1Choice: '',
-    p2Choice: '',
     numPlayers: 0,
     playerName: '',
     gameStart: false,
@@ -47,23 +44,24 @@ const dataController = (function () {
     currentTurn: 0,
     playerNum: 0,
     pRef: ''
-  }
+  };
 
 
   return {
-
     // Return dbRef object
     getDbRef: function () {
       return dbRef;
     },
 
+    // Returns all game local variables
     getGameData: function () {
       return gameData;
     }
-  }
+  };
 
 
 })();
+
 
 
 
@@ -94,16 +92,20 @@ const uiController = (function () {
     $p1Card: $('#p1-card'),
     $p2Card: $('#p2-card'),
     $p1Option: $('.p1-option'),
-    $p2Option: $('.p2-option')
-  }
+    $p2Option: $('.p2-option'),
+    $progressBar: $('#progress-bar'),
+    $playerRow: $('#player-row')
+  };
 
 
 
   return {
+    // Returns all DOM selectors
     getCacheDOM: function () {
       return cacheDOM;
     },
 
+    // Displays player name
     displayPlayerContent: function (name, selector) {
       selector.text(name);
     },
@@ -115,12 +117,14 @@ const uiController = (function () {
       selector.append(html);
     },
 
+    // Displays and updates scores
     displayPlayerScore: function (selector, wins, losses) {
       let html = `<p class="#26a69a teal lighten-1">Wins: <span id="p1-wins">${wins}</span></p><p class="#c62828 red darken-3">Losses: <span id="p1-losses">${losses}</span></p>`
       selector.empty();
       selector.append(html);
     },
 
+    // Display choice buttons
     displayChoices: function (player) {
       let pNum = player;
       let html = `<a class="waves-effect waves-light btn rock-btn hoverable option" data-choice="rock">Rock</a><a class="waves-effect waves-light btn paper-btn hoverable option" data-choice="paper">Paper</a><a class="waves-effect waves-light btn scissors-btn hoverable option" data-choice="scissors">Scissors</a>`
@@ -134,15 +138,17 @@ const uiController = (function () {
       }
     },
 
-
+    // Display who's turn it is it in the game status header of game card
     displayTurn: function (name) {
       cacheDOM.$gameStatus.text(`Your Turn, ${name}!`);
     },
 
+    // Displays waiting for certain player
     displayWaitingInGame: function (name) {
       cacheDOM.$gameStatus.text(`Waiting for ${name}'s selection...`);
     },
 
+    // Change backgroud of player's card depending on turn
     changePlayerBg: function (pNum) {
       if (pNum == 1) {
         cacheDOM.$p1Card.css('background-color', '#b2dfdb');
@@ -156,6 +162,7 @@ const uiController = (function () {
       }
     },
 
+    // Display the players' choices in the game card for animation
     displayPlayerChoice: function (player, choice) {
 
       let img = $("<img class='choice p" + player + "-choice'>").attr(
@@ -171,13 +178,13 @@ const uiController = (function () {
 
     },
 
+    // Displays who won
     displayResult: function (name) {
       cacheDOM.$gameStatus.text(`${name} Won!`);
     }
   }
 
 })();
-
 
 
 
@@ -224,10 +231,10 @@ const appController = (function (dataCtrl, uiCtrl) {
   };
 
 
-
+  // Set up all Firebase .on listeners to determine changes in database
   const setupOnListeners = () => {
 
-
+    // Determines changes in presence and determines how to proceed with the game
     dB.playersRef.on('value', (snap) => {
 
       gData.p1Presence = snap.child('p1').exists();
@@ -243,6 +250,12 @@ const appController = (function (dataCtrl, uiCtrl) {
         dB.turnRef.set(0);
         dom.$p1Action.empty();
         dom.$p2Action.empty();
+        dom.$progressBar.show();
+      }
+
+      if (gData.p1Presence === false && gData.p2Presence === false) {
+        dom.$gameStatus.empty();
+        dom.$gameStatus.text('Welcome!');
       }
 
       if (gData.numPlayers <= 2) {
@@ -284,7 +297,7 @@ const appController = (function (dataCtrl, uiCtrl) {
     });
 
 
-
+    // Listens for changes in the turn to determine what will occur after each player selects their choice
     dB.turnRef.on('value', (snap) => {
       gData.currentTurn = snap.val();
 
@@ -323,22 +336,22 @@ const appController = (function (dataCtrl, uiCtrl) {
 
         setTimeout(checkGame, 900);
 
-        setTimeout(nextRound, 4500);
+        setTimeout(nextRound, 4300);
       }
-
-
     });
 
-
+    // If the 2nd player has entered the game, start the game
     dB.playersRef.on('child_added', (snap) => {
       if (gData.numPlayers === 1) {
         dB.turnRef.set(1);
+        // uiCtrl.displayProgressBar(false);
+        dom.$progressBar.hide();
       }
     });
   };
 
 
-
+  // Game logic to determine which user won
   const checkGame = () => {
     if (gData.p1Data.choice === 'rock' && gData.p2Data.choice === 'rock') {
       tie();
@@ -359,9 +372,9 @@ const appController = (function (dataCtrl, uiCtrl) {
     } else if (gData.p1Data.choice === 'scissors' && gData.p2Data.choice === 'paper') {
       p1Won();
     }
-  }
+  };
 
-
+  // Updates wins for player 1 and losses for player 2
   const p1Won = () => {
     uiCtrl.displayResult(gData.p1Data.name);
 
@@ -369,8 +382,9 @@ const appController = (function (dataCtrl, uiCtrl) {
       dB.p1Ref.child('wins').set(gData.p1Data.wins + 1);
       dB.p2Ref.child('losses').set(gData.p2Data.losses + 1);
     }
-  }
+  };
 
+  // Updates wins for player 2 and losses for player 1
   const p2Won = () => {
     uiCtrl.displayResult(gData.p2Data.name);
 
@@ -378,14 +392,15 @@ const appController = (function (dataCtrl, uiCtrl) {
       dB.p2Ref.child('wins').set(gData.p2Data.wins + 1);
       dB.p1Ref.child('losses').set(gData.p1Data.losses + 1);
     }
-  }
+  };
 
+  // Displays tie game
   const tie = () => {
     dom.$gameStatus.text('Tie!');
-  }
+  };
 
 
-
+  // Determines how to proceed with the turn database after a round ends
   const nextRound = () => {
     dom.$p1Option.empty();
     dom.$p2Option.empty();
@@ -395,11 +410,9 @@ const appController = (function (dataCtrl, uiCtrl) {
     } else {
       dB.turnRef.set(0);
     }
-  }
+  };
 
-
-
-
+  // Update chat database after a user disconnects/joins and enters a new message
   const updateChatDb = (name, msg, status) => {
     let time = firebase.database.ServerValue.TIMESTAMP;
 
@@ -409,7 +422,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       time: time,
       status: status
     });
-  }
+  };
 
 
   // Displays input field and directions depending on if game in progress or not
@@ -421,19 +434,17 @@ const appController = (function (dataCtrl, uiCtrl) {
       dom.$modalHeader.text('Enter Your Name')
     }
 
-    if (gData.playerName.length === 0) {
-      $('#modal1').modal({
-        dismissible: false,
-        onOpenStart() {
-          outDuration: 300
-        }
-      })
-      $('#modal1').modal('open');
-    } else {
-      $('#modal1').modal('close');
-    }
-  }
+    $('#modal1').modal({
+      dismissible: false,
+      onOpenStart() {
+        outDuration: 300
+      }
+    })
 
+    if (gData.numPlayers < 2 || gData.chatName.length === 0) {
+      $('#modal1').modal('open');
+    }
+  };
 
 
   // Adds message database
@@ -447,7 +458,7 @@ const appController = (function (dataCtrl, uiCtrl) {
   };
 
 
-
+  // Check to ensure user doesn't enter an empty string when the modal opens. 
   const checkPlayerName = () => {
     var name = dom.$nameInput.val().trim();
     let gData = dataCtrl.getGameData();
@@ -459,7 +470,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       dom.$nameInput.val('');
       assignPlayerName(gData.playerName);
     }
-  }
+  };
 
   /*
   Assigns the username that is passed as an argument to the player 1 or 2 
@@ -492,6 +503,7 @@ const appController = (function (dataCtrl, uiCtrl) {
         });
 
         dB.p1Ref.onDisconnect().remove()
+        dB.playersRef.onDisconnect().remove()
 
         dbDisconnect.onDisconnect().set({
           name: name,
@@ -521,6 +533,7 @@ const appController = (function (dataCtrl, uiCtrl) {
         });
 
         dB.p2Ref.onDisconnect().remove();
+        dB.playersRef.onDisconnect().remove()
         dbDisconnect.onDisconnect().set({
           name: name,
           msg: 'Has left from the game.',
@@ -541,7 +554,7 @@ const appController = (function (dataCtrl, uiCtrl) {
       setupOnListeners();
       setupEventListeners();
     }
-  }
+  };
 
 })(dataController, uiController);
 

@@ -18,6 +18,11 @@ html {
   text-align: center;
 }
 
+#progress-bar {
+  width: 38%;
+  margin: auto;
+}
+
 .name-field {
   margin-bottom: 0;
 }
@@ -123,7 +128,7 @@ html {
 @keyframes moveInLeft {
   0% {
     opacity: 0;
-    transform: translateX(-280px);
+    transform: translateX(-230px);
     transform: scaleX(-1)
   }
 
@@ -149,7 +154,7 @@ html {
 @keyframes moveInRight {
   0% {
     opacity: 0;
-    transform: translateX(280px);
+    transform: translateX(230px);
     transform: scaleX(-1);
   }
 
